@@ -3,7 +3,7 @@
 [![NPM Version](http://img.shields.io/npm/v/web-midi-emitter.svg?style=flat-square)](https://www.npmjs.org/package/web-midi-emitter)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://mohayonao.mit-license.org/)
 
-> requestMIDIAccess for all
+> easy Web MIDI message handler
 
 
 ## Installation
