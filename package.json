@@ -8,6 +8,8 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-preset-es2015": "^6.9.0",
     "eater": "^3.0.0-5",
     "eatest": "^0.4.0",
     "eslint": "^3.0.1",
@@ -21,7 +23,8 @@
   "files": [
     "package.json",
     "README.md",
-    "index.js"
+    "src",
+    "lib"
   ],
   "homepage": "https://github.com/mohayonao/web-midi-emitter/",
   "keywords": [
@@ -31,18 +34,19 @@
     "webmidiapi"
   ],
   "license": "MIT",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mohayonao/web-midi-emitter.git"
   },
   "scripts": {
+    "build": "babel --out-dir=lib src",
     "clean": "rm -rf npm-debug.log",
-    "lint": "eslint index.js test.js",
+    "lint": "eslint src test",
     "postversion": "git push && git push --tags && npm run clean",
-    "prepublish": "npm-run-all clean lint test",
+    "prepublish": "npm-run-all clean lint test build",
     "preversion": "npm-run-all clean lint test",
-    "test": "eater test.js",
+    "test": "eater",
     "travis": "npm-run-all lint test"
   }
 }
