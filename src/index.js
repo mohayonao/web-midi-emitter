@@ -3,17 +3,18 @@
 const events = require("events");
 
 class WebMIDIEmitter extends events.EventEmitter {
-  constructor(access, deviceName) {
+  constructor(access, deviceNameMatcher) {
     super();
 
     this.access = access;
-    this.deviceName = deviceName;
+    this.deviceName = "";
+    this._deviceNameMatcher = deviceNameMatcher;
 
     this._setupInputPort();
     this._setupOutputPort();
 
     this.access.addEventListener("statechange", (e) => {
-      if (e.port.name === deviceName) {
+      if (e.port.name === this.deviceName) {
         this._setupInputPort();
         this._setupOutputPort();
         this.emit("statechange", e);
@@ -29,8 +30,9 @@ class WebMIDIEmitter extends events.EventEmitter {
 
   _setupInputPort() {
     if (!this.input) {
-      this.input = getPort(this.access.inputs, this.deviceName);
+      this.input = getPort(this.access.inputs, this._deviceNameMatcher);
       if (this.input) {
+        this.deviceName = this.input.name;
         this.input.onmidimessage = (e) => {
           this.emit("data", e.data);
         };
@@ -41,14 +43,17 @@ class WebMIDIEmitter extends events.EventEmitter {
 
   _setupOutputPort() {
     if (!this.output) {
-      this.output = getPort(this.access.outputs, this.deviceName);
+      this.output = getPort(this.access.outputs, this._deviceNameMatcher);
+      if (this.output) {
+        this.deviceName = this.output.name;
+      }
     }
     return this.output
   }
 }
 
-function getPort(map, deviceName) {
-  return Array.from(map.values()).filter(device => device.name === deviceName)[0] || null;
+function getPort(map, deviceNameMatcher) {
+  return Array.from(map.values()).filter(device => !!device.name.match(deviceNameMatcher))[0] || null;
 }
 
 module.exports = WebMIDIEmitter;
