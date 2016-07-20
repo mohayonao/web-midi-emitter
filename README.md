@@ -17,7 +17,7 @@ npm install --save web-midi-emitter
 ### WebMIDIEmitter
 - `constructor(access, deviceName)`
   - `access: MIDIAccess`
-  - `deviceName: string`
+  - `deviceName: string or RegExp`
 
 #### Instance methods
 - `write(data: number[]): void`
