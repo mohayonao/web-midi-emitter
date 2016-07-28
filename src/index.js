@@ -7,47 +7,49 @@ class WebMIDIEmitter extends events.EventEmitter {
     super();
 
     this.access = access;
-    this.deviceName = "";
-    this._deviceNameMatcher = deviceNameMatcher;
+    this.input = null;
+    this.output = null;
 
-    this._setupInputPort();
-    this._setupOutputPort();
+    this._setupInputPort(deviceNameMatcher);
+    this._setupOutputPort(deviceNameMatcher);
 
     this.access.addEventListener("statechange", (e) => {
-      if (e.port.name === this.deviceName) {
-        this._setupInputPort();
-        this._setupOutputPort();
+      if (this.input === null) {
+        this._setupInputPort(deviceNameMatcher);
+      }
+      if (this.output === null) {
+        this._setupOutputPort(deviceNameMatcher);
+      }
+      if (e.port === this.input || e.port === this.output) {
         this.emit("statechange", e);
       }
     });
   }
 
-  write(data) {
+  send(...args) {
     if (this.output) {
-      this.output.send(data);
+      this.output.send(...args);
     }
   }
 
-  _setupInputPort() {
-    if (!this.input) {
-      this.input = getPort(this.access.inputs, this._deviceNameMatcher);
-      if (this.input) {
-        this.deviceName = this.input.name;
-        this.input.onmidimessage = (e) => {
-          this.emit("data", e.data);
-        };
-      }
+  clear() {
+    if (this.output) {
+      this.output.clear();
+    }
+  }
+
+  _setupInputPort(deviceNameMatcher) {
+    this.input = getPort(this.access.inputs, deviceNameMatcher);
+    if (this.input !== null) {
+      this.input.onmidimessage = (e) => {
+        this.emit("midimessage", e);
+      };
     }
     return this.input;
   }
 
-  _setupOutputPort() {
-    if (!this.output) {
-      this.output = getPort(this.access.outputs, this._deviceNameMatcher);
-      if (this.output) {
-        this.deviceName = this.output.name;
-      }
-    }
+  _setupOutputPort(deviceNameMatcher) {
+    this.output = getPort(this.access.outputs, deviceNameMatcher);
     return this.output
   }
 }
