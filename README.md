@@ -15,18 +15,19 @@ npm install --save web-midi-emitter
 ## API
 
 ### WebMIDIEmitter
-- `constructor(access, deviceName)`
+- `constructor(access, deviceNameMatcher)`
   - `access: MIDIAccess`
-  - `deviceName: string or RegExp`
+  - `deviceNameMatcher: string or RegExp`
 
 #### Instance methods
-- `write(data: number[]): void`
+- `send(data: number[], [ timestamp: number ]): void`
   - send midi data to the midi device
+- `clear(): void`
 
 #### Events
 - `statechange`
   - emitted when change the state of the midi device
-- `data`
+- `midimessage`
   - emitted when receive midi data from the midi device
 
 ## How to use
@@ -41,11 +42,11 @@ window.navigator.requestMIDIAccess().then((access) => {
     console.log(e);
   });
 
-  device.on("data", (data) => {
-    console.log(data);
+  device.on("midimessage", (e) => {
+    console.log(e.data);
   });
 
-  device.write([ 0x90, 0x64, 0x7f ]);
+  device.send([ 0x90, 0x64, 0x7f ]);
 });
 ```
 
